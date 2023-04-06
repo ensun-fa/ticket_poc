@@ -84,37 +84,23 @@ with col3:
     q7 = st.selectbox("Quote item #7", line_items_list)
     q8 = st.selectbox("Quote item #8", line_items_list)
 
+# Convert numerical inputs as floats
+trips = float(trips)
+cleans = float(cleans)
+cr_min = float(cr_min)
+cr_max = float(cr_max)
+sqft = float(sqft)
+sqft_price = float(sqft_price)
+crew_best = float(crew_best)
+
+# Process the inputs
+mean_crew = (cr_max + cr_min) / 2
+avg_client_cost_per_tix = avg_client_cost_dict[client]
+
+spec_fixtures_encoded = spec_fixtures_enc.transform([spec_fixtures])
+
 with col4:
     st.write("Predicted job cost")
     st.write(":green[$1227.49]")
-# Create Streamlite sidebar panel
-# with st.sidebar:
-#     st.write("## Input parameters to the model:")
-#     st.write("Job details")
-#     job_market = st.selectbox("Job market", job_market_list)
-#     trips = st.slider("Trips", 0, 10, 5)
-#     cleans = st.slider("Number of cleans", 0, 10, 5)
-#     cr_min = st.slider("Crew Min", 0, 15, 5)
-#     cr_max = st.slider("Crew Max", 0, 15, 5)
-#     sqft = st.text_input("Job sqft")
-#     sqft_price = st.text_input("Sqft Price")
-#     client = st.selectbox("Client", client_list)
-#     crew_best = st.text_input("Crew Best (Labor hours)")
-#     spec_fixtures = st.selectbox("Specs - Fixtures", spec_fixtures_list)
-#     spec_vct = st.selectbox("Specs - VCT", spec_vct_list)
-
-#     st.write("Assigned SP details")
-#     zelle = st.selectbox("Is SP Eligible for Zelle?", zelle_list)
-#     sp_city = st.selectbox("SP's base city", sp_city_list)
-#     sp_state = st.selectbox("SP's base state", sp_state_list)
-    
-#     st.write("Quotation details (line items only)")
-#     q1 = st.selectbox("Quote item #1", line_items_list)
-#     q2 = st.selectbox("Quote item #2", line_items_list)
-#     q3 = st.selectbox("Quote item #3", line_items_list)
-#     q4 = st.selectbox("Quote item #4", line_items_list)
-#     q5 = st.selectbox("Quote item #5", line_items_list)
-#     q6 = st.selectbox("Quote item #6", line_items_list)
-#     q7 = st.selectbox("Quote item #7", line_items_list)
-#     q8 = st.selectbox("Quote item #8", line_items_list)
-
+    st.write("Mean crew:", f"{mean_crew}")
+    st.write("Avg Client Cost Per Tix:", f"${avg_client_cost_per_tix:.2f}")
