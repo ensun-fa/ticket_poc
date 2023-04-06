@@ -20,6 +20,7 @@ city_enc = load_pickle("city_encoder")
 market_enc = load_pickle("market_encoder")
 sp_state_enc = load_pickle("sp_state_encoder")
 spec_fixtures_enc = load_pickle("spec_fixtures_encoder")
+spec_VCT_enc = load_pickle("spec_VCT_encoder")
 zelle_enc = load_pickle("zelle_encoder")
 
 # Load the mappers
@@ -56,6 +57,8 @@ with col1:
     # st.write("## Input parameters to the model:")
     st.write(":orange[Job details]")
     job_market = st.selectbox("Job market", job_market_list)
+    bid_date = st.date_input("Job bid date")
+    serv_date = st.date_input("Job servicing date")
     trips = st.slider("Trips", 0, 10, 5)
     cleans = st.slider("Number of cleans", 0, 10, 5)
     cr_min = st.slider("Crew Min", 0, 15, 5)
@@ -96,11 +99,34 @@ crew_best = float(crew_best)
 # Process the inputs
 mean_crew = (cr_max + cr_min) / 2
 avg_client_cost_per_tix = avg_client_cost_dict[client]
+bid_conversion_dur = (serv_date - bid_date).days
 
 spec_fixtures_encoded = spec_fixtures_enc.transform([spec_fixtures])
+spec_VCT_encoded = spec_VCT_enc.transform([spec_vct])
+zelle_encoded = zelle_enc.transform([zelle])
+sp_city_encoded = city_enc.transform([sp_city])
+sp_state_encoded = sp_state_enc.transform([sp_state])
+market_encoded = market_enc.transform([job_market])
+
+quote_items = [q1, q2, q3, q4, q5, q6, q7, q8]
+count_quote_items = len([x for x in quote_items if x != "None"])
+line_items = [x for x in quote_items if x != "None"]
+line_items = sorted(line_items)
+line_items = '_'.join([i for i in line_items])
+line_items_encoded = line_items_dict.get(line_items, np.median(list(line_items_dict.values())))
+
 
 with col4:
     st.write("Predicted job cost")
-    st.write(":green[$1227.49]")
-    st.write("Mean crew:", f"{mean_crew}")
-    st.write("Avg Client Cost Per Tix:", f"${avg_client_cost_per_tix:.2f}")
+    st.write(":green[$1,227.49]")
+    st.write("Mean crew: ", f"{mean_crew}")
+    st.write("Avg Client Cost Per Tix: ", f"${avg_client_cost_per_tix:,.2f}")
+    st.write("Encoded fixtures specification: ", f"{spec_fixtures_encoded[0]}")
+    st.write("Quote items count: ", f"{count_quote_items}")
+    st.write("Encoded VCT specification: ", f"{spec_VCT_encoded[0]}")
+    st.write("Encoded eligible for Zelle: ", f"{zelle_encoded[0]}")
+    st.write("Encoded SP city of operations: ", f"{sp_city_encoded[0]}")
+    st.write("Encoded SP state of operations: ", f"{sp_state_encoded[0]}")
+    st.write("Encoded job market: ", f"{market_encoded[0]}")
+    st.write("Bid conversion duration: ", f"{bid_conversion_dur}")
+    st.write("Encoded line items: ", f"{line_items_encoded:,.2f}")
