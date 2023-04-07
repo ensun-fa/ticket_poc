@@ -1,6 +1,14 @@
+"""
+Author: Ensun Pak
+Organization: Four Analytics, Inc
+Date: April 7, 2023
+Function: Deployment of XGBoost model with Streamlit, data hosted on Github.
+"""
+
 # Import libraries
 import streamlit as st
 import numpy as np
+import pandas as pd
 import pickle
 
 
@@ -10,6 +18,7 @@ def load_pickle(file_name):
     """
     with open("./files/" + file_name + ".p", "rb") as f:
         return pickle.load(f)
+
 
 # Load the trained XGBoost model
 with open("./files/xgboost3_ticket.p", "rb") as f:
@@ -113,12 +122,34 @@ count_quote_items = len([x for x in quote_items if x != "None"])
 line_items = [x for x in quote_items if x != "None"]
 line_items = sorted(line_items)
 line_items = '_'.join([i for i in line_items])
-line_items_encoded = line_items_dict.get(line_items, np.median(list(line_items_dict.values())))
+line_items_encoded = line_items_dict.get(line_items,
+                                         np.median(list(
+                                            line_items_dict.values()
+                                            )))
 
+# Construct array from user input, XGboost requires column names because it
+# was trained with column names
+new_data = np.array([trips, mean_crew, cr_max, cr_min, sqft,
+                     avg_client_cost_per_tix, sqft_price,
+                     spec_fixtures_encoded, count_quote_items,
+                     spec_VCT_encoded, line_items_encoded, zelle_encoded,
+                     cleans, sp_city_encoded, bid_conversion_dur, crew_best,
+                     sp_state_encoded, market_encoded]).astype('float')
+
+data_labels = ["Trips", "mean_crew", "cr_max", "cr_min", "sqft",
+               "avg_client_cost_per_tix", "Sqft Price", "Spec_fixtures_enc",
+               "Quote_lines_count", "Spec_VCTService_enc",
+               "line_item_mean_enc", "sp_zelle_elig_enc", "Cleans",
+               "sp_city_enc", "bid_conversion_dur", "Crew_Best",
+               "sp_state_enc", "Market_enc"]
+new_data = pd.DataFrame(new_data).T
+new_data.columns = data_labels
+
+# Predict the input from the user
+predict = model.predict(new_data)
 
 with col4:
-    st.write("Predicted job cost")
-    st.write(":green[$1,227.49]")
+    st.write("##### Predicted job cost:", f"${predict[0]:,.2f}")
     st.write("Mean crew: ", f"{mean_crew}")
     st.write("Avg Client Cost Per Tix: ", f"${avg_client_cost_per_tix:,.2f}")
     st.write("Encoded fixtures specification: ", f"{spec_fixtures_encoded[0]}")
